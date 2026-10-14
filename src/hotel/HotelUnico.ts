@@ -39,6 +39,14 @@ export class HotelUnico {
     return quarto;
   }
 
+  // Prototype: clona um quarto que já existe em vez de criar do zero
+  cadastrarCopia(numeroModelo: number, novoNumero: number): Quarto {
+    const copia = this.buscarQuarto(numeroModelo).clonar();
+    copia.setNumero(novoNumero);
+    this.quartos.push(copia);
+    return copia;
+  }
+
   buscarQuarto(numero: number): Quarto {
     const quarto = this.quartos.find((q) => q.getNumero() === numero);
     if (!quarto) {

@@ -17,6 +17,17 @@ hotel.cadastrarQuarto(new CriadorQuartoSimples(), 101);
 hotel.cadastrarQuarto(new CriadorQuartoDuplo(), 102);
 hotel.cadastrarQuarto(new CriadorQuartoLuxo(), 201);
 
+// Prototype
+const modelo = hotel.buscarQuarto(201);
+modelo.adicionarComodidade("ar-condicionado");
+modelo.adicionarComodidade("frigobar");
+
+const copia = hotel.cadastrarCopia(201, 202);
+copia.adicionarComodidade("banheira");
+
+console.log(`Modelo ${modelo.getNumero()}: ${modelo.getComodidades().join(", ")}`);
+console.log(`Cópia ${copia.getNumero()}: ${copia.getComodidades().join(", ")}`);
+
 const ana = new Cliente("Ana Souza", "ana@email.com", "99999-1111", "vip");
 const pedro = new Cliente("Pedro Lima", "pedro@email.com", "98888-2222", "normal");
 

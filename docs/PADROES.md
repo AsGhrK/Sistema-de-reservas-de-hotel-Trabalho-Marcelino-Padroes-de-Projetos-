@@ -1,39 +1,39 @@
 # Padrões usados no sistema de reservas de hotel
 
 ## Factory Method
-**Onde:** `src/quartos/CriadorQuarto.ts` (creator e subclasses), `src/quartos/Quarto.ts` e `src/quartos/QuartosConcretos.ts` (produtos). Quem usa é o `HotelUnico.cadastrarQuarto()`.
+Onde src/quartos/CriadorQuarto.ts o creator src/quartos/Quarto.ts e src/quartos/QuartosConcretos.ts os quartos Quem usa é o cadastrarQuarto do HotelUnico
 
-**Problema:** o hotel tem quartos simples, duplo e luxo. Se o `HotelUnico` decidisse com um `if` qual quarto criar, toda vez que surgisse um tipo novo eu teria que mexer nele.
+Problema o hotel tem quarto simples duplo e luxo Se o HotelUnico escolhesse o tipo com um if toda vez que aparecesse um quarto novo eu ia ter que mexer nele
 
-**Por quê:** o `CriadorQuarto` é abstrato e tem o método `criarQuarto()`. Cada subclasse (`CriadorQuartoSimples`, `CriadorQuartoDuplo`, `CriadorQuartoLuxo`) decide qual quarto concreto criar. O hotel só conhece o creator abstrato e a interface `Quarto`. Para um tipo novo eu crio 2 classes (o quarto e o creator) e não altero o hotel.
+Por quê o CriadorQuarto é abstrato e tem o método criarQuarto Cada subclasse CriadorQuartoSimples CriadorQuartoDuplo e CriadorQuartoLuxo escolhe qual quarto criar O hotel só conhece o creator abstrato e a interface Quarto então ele não sabe qual quarto vai ser criado Se eu quiser um quarto novo crio o quarto e o creator dele e não mexo no hotel
 
 ## Singleton
-**Onde:** `src/hotel/HotelUnico.ts`.
+Onde src/hotel/HotelUnico.ts
 
-**Problema:** o hotel é um só e guarda os quartos e as reservas. Se cada parte do sistema criasse o seu próprio hotel, cada um teria dados diferentes.
+Problema o hotel é um só e guarda os quartos e as reservas Se cada parte do código criasse o seu hotel cada um ia ter dados diferentes
 
-**Por quê:** o construtor é privado e o método estático `obterInstancia()` cria o hotel na primeira chamada e devolve sempre o mesmo depois. No `index.ts` dá para ver que `hotel === HotelUnico.obterInstancia()` é `true`. Os parâmetros (nome e endereço) só valem na primeira chamada.
+Por quê o construtor é privado então ninguém consegue dar new HotelUnico de fora O obterInstancia cria o hotel na primeira vez e depois devolve sempre o mesmo No index.ts eu testei isso com hotel === HotelUnico.obterInstancia e deu true O nome e o endereço só valem na primeira chamada
 
 ## Abstract Factory
-**Onde:** `src/tarifas/FabricaPlano.ts` (a fábrica e as duas famílias) e `src/tarifas/Politicas.ts` (os produtos). Quem usa é o `ReservaBuilder.plano()`.
+Onde src/tarifas/FabricaPlano.ts as fábricas e src/tarifas/Politicas.ts as políticas Quem usa é o plano do ReservaBuilder
 
-**Problema:** cada reserva segue um plano tarifário com duas peças que precisam combinar: a política de preço e a política de cancelamento. Se elas fossem escolhidas separadas, daria para misturar o preço promocional com o cancelamento flexível.
+Problema cada reserva tem um plano com duas coisas que precisam combinar a política de preço e a política de cancelamento Se eu escolhesse cada uma separada dava para juntar o preço da promoção com o cancelamento flexível
 
-**Por quê:** a interface `FabricaPlano` tem `criarPoliticaPreco()` e `criarPoliticaCancelamento()`. `FabricaPlanoFlexivel` e `FabricaPlanoPromocional` só criam peças do próprio plano, então a família sempre sai combinando. A reserva só conhece a interface, e criar um plano novo não muda quem usa.
+Por quê a interface FabricaPlano cria as duas coisas criarPoliticaPreco e criarPoliticaCancelamento A FabricaPlanoFlexivel e a FabricaPlanoPromocional só criam as do próprio plano então nunca mistura A reserva só conhece a interface e se eu criar um plano novo não preciso mexer nela
 
 ## Builder
-**Onde:** `src/reservas/ReservaBuilder.ts`, que monta a `Reserva` de `src/reservas/Reserva.ts`.
+Onde src/reservas/ReservaBuilder.ts que monta a Reserva de src/reservas/Reserva.ts
 
-**Problema:** a reserva tem partes obrigatórias (cliente, quarto, período e plano) e partes opcionais (café da manhã, estacionamento e observações). Um construtor com tudo isso teria vários valores vazios e ninguém saberia o que cada posição significa.
+Problema a reserva tem o que é obrigatório cliente quarto período e plano e o que é opcional café da manhã estacionamento e observações Se fosse tudo no construtor ia ficar uma lista enorme de parâmetros e ninguém ia saber o que é cada um
 
-**Por quê:** cada parte tem seu método (`cliente()`, `quarto()`, `cafeDaManha()`...), que devolve `this` para encadear. O `build()` confere o que é obrigatório e só coloca na reserva o que foi configurado. O builder também recebe a `FabricaPlano`, então ele usa o Abstract Factory.
+Por quê cada parte tem o seu método cliente quarto cafeDaManha e todos devolvem this por isso dá para encadear O build confere se o que é obrigatório foi passado e só coloca na reserva o opcional que eu chamei O plano que o builder recebe é a Abstract Factory então os dois padrões trabalham juntos
 
 ## Prototype
-**Onde:** o método `clonar()` em `src/quartos/QuartosConcretos.ts` (declarado em `src/quartos/Quarto.ts`). Quem usa é o `HotelUnico.cadastrarCopia()`.
+Onde o método clonar em src/quartos/QuartosConcretos.ts ele está declarado em src/quartos/Quarto.ts Quem usa é o cadastrarCopia do HotelUnico
 
-**Problema:** muitos quartos são parecidos com outro que já existe (mesmo tipo e mesmas comodidades), só muda o número. Criar do zero e repetir as comodidades toda vez dá trabalho e pode dar erro.
+Problema muitos quartos são iguais a outro que já existe só muda o número Criar do zero e colocar as comodidades de novo toda vez dá trabalho
 
-**Por quê:** o `clonar()` cria um quarto novo copiando a lista de comodidades com `[...this.comodidades]`. Assim a lista da cópia é outra, e adicionar uma comodidade na cópia não muda o modelo. Sem isso os dois quartos dividiriam a mesma lista.
+Por quê o clonar cria um quarto novo copiando a lista de comodidades com [...this.comodidades] Assim a lista da cópia é outra e se eu colocar uma comodidade na cópia o quarto original não muda Sem isso os dois quartos iam usar a mesma lista
 
-## Como os padrões se conectam
-O `HotelUnico` (Singleton) cria os quartos pelo Factory Method e também faz cópias deles com o Prototype. Na reserva, o Builder recebe a fábrica do plano (Abstract Factory) e entrega a reserva pronta para o hotel guardar. São cinco padrões no mesmo fluxo, e não cinco exercícios separados.
+## Como os padrões se juntam
+O HotelUnico Singleton cria os quartos pelo Factory Method e também copia quartos com o Prototype Na reserva o Builder recebe o plano da Abstract Factory e entrega a reserva pronta para o hotel guardar Os cinco padrões trabalham no mesmo sistema
